@@ -1,5 +1,5 @@
 trigger:
-- main
+- master
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -9,11 +9,33 @@ stages:
     jobs:
       - job: Build
         steps:
-          - task: Maven@3
-            inputs:
-              mavenPomFile: 'pom.xml'
-              goals: 'clean package'
+        - task: MavenAuthenticate@0
+          inputs:
+            artifactsFeeds: 'java-app' # Replace with your Azure Artifacts feed name
 
-          # Publish the JAR file as an artifact
-          - publish: $(System.DefaultWorkingDirectory)/target
-            artifact: drop
+        - script: mvn clean package
+          displayName: 'Build Java Project'
+
+        - script: mvn deploy
+          displayName: 'Deploy to Azure Artifacts'
+          env:
+            MAVEN_SETTINGS_FILE: $(MAVEN_SETTINGS_PATH) # Optional, if using a custom settings.xml
+
+# trigger:
+# - master
+
+# pool:
+#   vmImage: 'ubuntu-latest'
+
+# steps:
+# - task: MavenAuthenticate@1
+#   inputs:
+#     artifactsFeeds: 'java-app' # Replace with your Azure Artifacts feed name
+
+# - script: mvn clean package
+#   displayName: 'Build Java Project'
+
+# - script: mvn deploy
+#   displayName: 'Deploy to Azure Artifacts'
+#   env:
+#     MAVEN_SETTINGS_FILE: $(MAVEN_SETTINGS_PATH) # Optional, if using a custom settings.xml
