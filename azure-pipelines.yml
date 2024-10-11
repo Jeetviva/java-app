@@ -16,11 +16,11 @@ stages:
         - script: mvn clean package
           displayName: 'Build Java Project'
 
-        - script: mvn deploy
+        - script: |
+            mvn deploy -DaltDeploymentRepository=gitlab-repo::default::https://gitlab-ci-token:$(MAVEN_SETTINGS_FILE)@gitlab.com/api/v4/projects/1/packages/maven
           displayName: 'Deploy to Azure Artifacts'
           env:
             MAVEN_SETTINGS_FILE: $(MAVEN_SETTINGS_PATH) # Optional, if using a custom settings.xml
-
 # trigger:
 # - master
 
